@@ -46,9 +46,7 @@ public class KakaoAuthService {
 
         HttpEntity<?> request = new HttpEntity<>(bodyParams, headers);
 
-        KakaoToken response = restTemplate.postForObject(tokenUrl, request, KakaoToken.class);
-
-        return response;
+        return restTemplate.postForObject(tokenUrl, request, KakaoToken.class);
     }
 
     // 프로필 정보 조회
@@ -62,8 +60,6 @@ public class KakaoAuthService {
 
         HttpEntity<?> request = new HttpEntity<>(headers);
 
-        KakaoProfileInfoResponse response = restTemplate.postForObject(profileUrl, request, KakaoProfileInfoResponse.class);
-
-        return response;
+        return restTemplate.postForObject(profileUrl, request, KakaoProfileInfoResponse.class);
     }
 }

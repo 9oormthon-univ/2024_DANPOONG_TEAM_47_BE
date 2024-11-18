@@ -1,4 +1,0 @@
-kakao:
-  client-id: "1006f782aaf171570d9dd000bc7b8c12"
-  redirect-uri: "http://localhost:8080/api/kongju/auth/kakao/callback"
-  logout-redirect-uri: "http://localhost:8080/api/kongju/auth/kakao/logout"
