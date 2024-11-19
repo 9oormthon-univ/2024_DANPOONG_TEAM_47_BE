@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import univ.goormthon.kongju.domain.member.entity.Member;
+import univ.goormthon.kongju.domain.parking.dto.request.ParkingRegisterRequest;
 import univ.goormthon.kongju.global.entity.BaseTimeEntity;
 
 @Entity
@@ -57,5 +58,16 @@ public class Parking extends BaseTimeEntity {
         this.pmCapacity = pmCapacity;
         this.description = description;
         this.rate = rate;
+    }
+
+    public void update(ParkingRegisterRequest request) {
+        this.name = request.getName();
+        this.address = request.getAddress();
+        this.latitude = request.getLatitude();
+        this.longitude = request.getLongitude();
+        this.carCapacity = request.getCarCapacity();
+        this.pmCapacity = request.getPmCapacity();
+        this.description = request.getDescription();
+        this.rate = request.getRate();
     }
 }

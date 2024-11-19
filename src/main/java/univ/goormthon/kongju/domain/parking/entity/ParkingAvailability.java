@@ -22,7 +22,7 @@ public class ParkingAvailability {
 
     @Column(name = "available_day")
     @Enumerated(EnumType.STRING)
-    private AvailableDay availableDay;
+    private AvailableDay day;
 
     @Column(name = "start_time")
     private LocalTime startTime;
@@ -31,9 +31,9 @@ public class ParkingAvailability {
     private LocalTime endTime;
 
     @Builder
-    public ParkingAvailability(Long parkingId, AvailableDay availableDay, LocalTime startTime, LocalTime endTime) {
+    public ParkingAvailability(Long parkingId, AvailableDay day, LocalTime startTime, LocalTime endTime) {
         this.parkingId = parkingId;
-        this.availableDay = availableDay;
+        this.day = day;
         this.startTime = startTime;
         this.endTime = endTime;
     }

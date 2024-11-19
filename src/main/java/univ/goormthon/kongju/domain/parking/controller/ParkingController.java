@@ -1,47 +1,41 @@
 package univ.goormthon.kongju.domain.parking.controller;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import univ.goormthon.kongju.domain.parking.dto.request.ParkingRegisterRequest;
+import univ.goormthon.kongju.domain.parking.entity.Parking;
 import univ.goormthon.kongju.domain.parking.service.ParkingService;
 
+import java.util.List;
+
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/kongju/parking")
+@RequiredArgsConstructor
 public class ParkingController {
 
     private final ParkingService parkingService;
-
-    @PostMapping("/create")
-    public ResponseEntity<?> createParking() {
-        return ResponseEntity.ok(parkingService.createParking());
+    @PostMapping("/register")
+    public ResponseEntity<Parking> registerParking(
+            HttpSession session,
+            @RequestPart("request") ParkingRegisterRequest request,
+            @RequestPart("images") List<MultipartFile> images) {
+        request.setImages(images);
+        Parking parking = parkingService.registerParking(session, request);
+        return ResponseEntity.ok(parking);
     }
 
-    // 내 주차장 조회
-    @GetMapping("/get")
-    public ResponseEntity<?> getMyParking() {
-        return ResponseEntity.ok(parkingService.getMyParking());
-    }
-
-    /**
-     * 주차장 조회
-     * 지도 중심 반경 500m 이내의 모든 주차장 조회
-     * @return List
-     */
-    @GetMapping("/list")
-    public ResponseEntity<?> getParking() {
-        return ResponseEntity.ok(parkingService.getParking());
-    }
-
-    // 내 주차장 수정
     @PutMapping("/update")
-    public ResponseEntity<?> updateMyParking() {
-        return ResponseEntity.ok(parkingService.updateMyParking());
+    public ResponseEntity<Parking> updateParking(HttpSession session, @RequestParam Long parkingId, @RequestBody ParkingRegisterRequest request) {
+        Parking updatedParking = parkingService.updateParking(session, parkingId, request);
+        return ResponseEntity.ok(updatedParking);
     }
 
-    // 내 주차장 삭제
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteMyParking() {
-        return ResponseEntity.ok(parkingService.deleteMyParking());
+    public ResponseEntity<Void> deleteParking(HttpSession session, @RequestParam Long parkingId) {
+        parkingService.deleteParking(session, parkingId);
+        return ResponseEntity.noContent().build();
     }
 }

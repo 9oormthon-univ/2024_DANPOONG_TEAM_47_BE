@@ -27,4 +27,8 @@ public class ParkingImage{
         this.parkingId = parkingId;
         this.imageUrl = imageUrl;
     }
+
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

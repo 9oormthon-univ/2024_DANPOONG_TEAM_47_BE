@@ -6,4 +6,5 @@ import univ.goormthon.kongju.domain.parking.entity.ParkingImage;
 
 @Repository
 public interface ParkingImageRepository extends JpaRepository<ParkingImage, Long> {
+    void deleteByParkingId(Long parkingId);
 }
