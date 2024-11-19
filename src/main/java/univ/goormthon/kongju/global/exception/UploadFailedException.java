@@ -2,8 +2,8 @@ package univ.goormthon.kongju.global.exception;
 
 import univ.goormthon.kongju.global.exception.dto.ErrorCode;
 
-public class UserNotFoundException extends KongjuException {
-    public UserNotFoundException(ErrorCode errorCode) {
+public class UploadFailedException extends KongjuException {
+    public UploadFailedException(ErrorCode errorCode) {
         super(errorCode);
     }
 }
