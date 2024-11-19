@@ -7,7 +7,7 @@ import univ.goormthon.kongju.domain.member.dto.response.ProfileInfo;
 import univ.goormthon.kongju.domain.member.entity.Member;
 import univ.goormthon.kongju.domain.member.repository.MemberRepository;
 import univ.goormthon.kongju.global.auth.kakao.dto.KakaoProfileInfoResponse;
-import univ.goormthon.kongju.global.exception.UserNotFoundException;
+import univ.goormthon.kongju.global.exception.NotFoundException;
 import univ.goormthon.kongju.global.exception.dto.ErrorCode;
 
 @Service
@@ -58,7 +58,7 @@ public class MemberService {
     @Transactional
     public ProfileInfo getProfile(Member member) {
         Member currentMember = memberRepository.findById(member.getId())
-                .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         return ProfileInfo.builder()
                 .memberId(currentMember.getId())
