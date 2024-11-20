@@ -31,4 +31,4 @@ springdoc:
     groups-order: desc
 
 frontend:
-  domain: "http://localhost:3000"
+  domain: "*"
