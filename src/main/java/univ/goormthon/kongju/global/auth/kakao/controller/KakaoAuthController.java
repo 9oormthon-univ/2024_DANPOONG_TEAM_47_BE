@@ -1,5 +1,11 @@
 package univ.goormthon.kongju.global.auth.kakao.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +28,16 @@ import java.net.URI;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/kongju")
+@Tag(name = "카카오 로그인", description = "카카오 로그인 API")
 public class KakaoAuthController {
 
     private final KakaoAuthService kakaoAuthService;
     private final MemberService memberService;
 
-    //  카카오 로그인 페이지로 Redirect
+    @Operation(summary = "카카오 로그인", description = "카카오 로그인")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "카카오 로그인창으로 리다이렉트")
+    })
     @GetMapping("/login")
     public ResponseEntity<?> kakaoLogin() {
         String kakaoAuthUrl = "https://kauth.kakao.com/oauth/authorize?response_type=code"
@@ -39,6 +49,13 @@ public class KakaoAuthController {
         return ResponseEntity.status(HttpStatus.FOUND).headers(headers).build();
     }
 
+    @Operation(summary = "카카오 로그인 콜백", description = "카카오 인증 서버로 code를 반환받고 code를 이용하여 access token을 발급받습니다.")
+    @Parameters(value = {
+            @Parameter(name = "code", description = "인가코드")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "메인으로 리다이렉트")
+    })
     @GetMapping("/auth/kakao/callback")
     public ResponseEntity<?> kakaoCallback(@RequestParam("code") String code, HttpSession session) {
         KakaoToken accessToken = kakaoAuthService.getAccessToken(code);
@@ -58,6 +75,10 @@ public class KakaoAuthController {
     }
 
     // 로그아웃
+    @Operation(summary = "카카오 로그아웃", description = "카카오 로그아웃")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "카카오 로그아웃창으로 리다이렉트")
+    })
     @GetMapping("/logout")
     public ResponseEntity<?> kakaoLogout() {
         String kakaoLogoutUrl = "https://kauth.kakao.com/oauth/logout"
