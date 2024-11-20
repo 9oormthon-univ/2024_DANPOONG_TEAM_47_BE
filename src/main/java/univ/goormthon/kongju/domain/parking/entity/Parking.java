@@ -18,7 +18,7 @@ public class Parking extends BaseTimeEntity {
     @Column(name = "parking_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
