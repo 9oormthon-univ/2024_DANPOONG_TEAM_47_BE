@@ -18,7 +18,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build
-          gradle-version: 9.0
+          gradle-version: 8.10.2
 
       # 3. AWS CLI 설정
       - name: Configure AWS credentials
