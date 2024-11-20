@@ -36,6 +36,11 @@ public class ParkingService {
     private final ParkingAvailabilityRepository parkingAvailabilityRepository;
     private final S3UploadService s3UploadService;
 
+    @Transactional(readOnly = true)
+    public List<Parking> getNearbyParkings(Double latitude, Double longitude, Double radius) {
+        return parkingRepository.findAllWithinRadius(latitude, longitude, radius);
+    }
+
     @Transactional
     public Parking registerParking(HttpSession session, ParkingRegisterRequest request) {
         Member member = validateMemberSession(session);

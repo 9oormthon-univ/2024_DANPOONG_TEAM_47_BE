@@ -18,6 +18,12 @@ import java.util.List;
 public class ParkingController {
 
     private final ParkingService parkingService;
+    @GetMapping("/nearby")
+    public ResponseEntity<List<Parking>> getNearbyParkings(@RequestParam Double latitude,
+                                                           @RequestParam Double longitude,
+                                                           @RequestParam(defaultValue = "0.5") Double radius) {
+        return ResponseEntity.ok(parkingService.getNearbyParkings(latitude, longitude, radius));
+    }
     @PostMapping("/register")
     public ResponseEntity<ParkingRegisterResponse> registerParking(
             HttpSession session,
