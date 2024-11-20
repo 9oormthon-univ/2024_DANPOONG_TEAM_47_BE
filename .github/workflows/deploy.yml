@@ -1,0 +1,45 @@
+name: CI/CD Deploy to EC2
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Gradle 빌드
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
+          gradle-version: 9.0
+
+      # 3. AWS CLI 설정
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ap-northeast-2
+
+      # 4. EC2로 빌드된 JAR 파일 업로드
+      - name: Transfer JAR to EC2
+        run: |
+          scp -i ${{ secrets.EC2_SSH_KEY }} build/libs/*.jar ubuntu@${{ secrets.EC2_HOST }}:/home/spring_server/app.jar
+
+      # 5. EC2에서 S3에서 application-prod.yml 다운로드 및 서버 실행
+      - name: Start application on EC2
+        run: |
+          ssh -i ${{ secrets.EC2_SSH_KEY }} ubuntu@${{ secrets.EC2_HOST }} << EOF
+          # S3에서 application-prod.yml 다운로드
+          aws s3 cp s3://your-bucket-name/application-prod.yml /home/spring_server/application-prod.yml
+
+          # 서버 실행
+          nohup java -jar -Dspring.config.location=/home/spring_server/application-prod.yml /home/spring_server/app.jar > /home/spring_server/app.log 2>&1 &
+          EOF
