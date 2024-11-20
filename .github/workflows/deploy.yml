@@ -45,7 +45,7 @@ jobs:
         run: |
           ssh -i ${{ secrets.EC2_SSH_KEY }} ubuntu@${{ secrets.EC2_HOST }} << EOF
           # S3에서 application-prod.yml 다운로드
-          aws s3 cp s3://your-bucket-name/application-prod.yml /home/spring_server/application-prod.yml
+          aws s3 cp s3://kongju-s3-bucket/application-prod.yml /home/spring_server/application-prod.yml
 
           # 서버 실행
           nohup java -jar -Dspring.config.location=/home/spring_server/application-prod.yml /home/spring_server/app.jar > /home/spring_server/app.log 2>&1 &
