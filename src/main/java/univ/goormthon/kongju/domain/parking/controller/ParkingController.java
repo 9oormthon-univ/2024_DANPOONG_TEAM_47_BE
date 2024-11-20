@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import univ.goormthon.kongju.domain.parking.dto.request.ParkingRegisterRequest;
+import univ.goormthon.kongju.domain.parking.dto.response.ParkingRegisterResponse;
 import univ.goormthon.kongju.domain.parking.entity.Parking;
 import univ.goormthon.kongju.domain.parking.service.ParkingService;
 
@@ -18,19 +19,22 @@ public class ParkingController {
 
     private final ParkingService parkingService;
     @PostMapping("/register")
-    public ResponseEntity<Parking> registerParking(
+    public ResponseEntity<ParkingRegisterResponse> registerParking(
             HttpSession session,
             @RequestPart("request") ParkingRegisterRequest request,
             @RequestPart("images") List<MultipartFile> images) {
         request.setImages(images);
         Parking parking = parkingService.registerParking(session, request);
-        return ResponseEntity.ok(parking);
+        return ResponseEntity.ok(parkingService.EntitytoDto(parking));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Parking> updateParking(HttpSession session, @RequestParam Long parkingId, @RequestBody ParkingRegisterRequest request) {
+    public ResponseEntity<ParkingRegisterResponse> updateParking(HttpSession session, @RequestParam Long parkingId,
+                                                 @RequestPart("request") ParkingRegisterRequest request,
+                                                 @RequestPart("images") List<MultipartFile> images) {
+        request.setImages(images);
         Parking updatedParking = parkingService.updateParking(session, parkingId, request);
-        return ResponseEntity.ok(updatedParking);
+        return ResponseEntity.ok(parkingService.EntitytoDto(updatedParking));
     }
 
     @DeleteMapping("/delete")

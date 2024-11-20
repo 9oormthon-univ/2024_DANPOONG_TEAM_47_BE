@@ -2,12 +2,14 @@ package univ.goormthon.kongju.domain.parking.service;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import univ.goormthon.kongju.domain.member.entity.Member;
 import univ.goormthon.kongju.domain.parking.dto.request.ParkingAvailabilityRequest;
 import univ.goormthon.kongju.domain.parking.dto.request.ParkingRegisterRequest;
+import univ.goormthon.kongju.domain.parking.dto.response.ParkingRegisterResponse;
 import univ.goormthon.kongju.domain.parking.entity.AvailableDay;
 import univ.goormthon.kongju.domain.parking.entity.Parking;
 import univ.goormthon.kongju.domain.parking.entity.ParkingAvailability;
@@ -22,9 +24,9 @@ import univ.goormthon.kongju.global.exception.dto.ErrorCode;
 import univ.goormthon.kongju.global.service.S3UploadService;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ParkingService {
@@ -34,18 +36,6 @@ public class ParkingService {
     private final ParkingAvailabilityRepository parkingAvailabilityRepository;
     private final S3UploadService s3UploadService;
 
-//    public List<String> uploadImages(List<MultipartFile> images) {
-//        List<String> imageUrls = new ArrayList<>();
-//        for (MultipartFile image : images) {
-//            try {
-//                String imageUrl = s3UploadService.upload(image);
-//                imageUrls.add(imageUrl);
-//            } catch (Exception e) {
-//                throw new UploadFailedException(ErrorCode.FAILED_TO_UPLOAD);
-//            }
-//        }
-//        return imageUrls;
-//    }
     @Transactional
     public Parking registerParking(HttpSession session, ParkingRegisterRequest request) {
         Member member = validateMemberSession(session);
@@ -109,6 +99,7 @@ public class ParkingService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PARKING_NOT_FOUND));
 
         if (!parking.getMember().equals(member)) {
+            log.info("member: {}, parkingOwner: {}", member.getId(), parking.getMember().getId());
             throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
         }
         return parking;
@@ -139,5 +130,11 @@ public class ParkingService {
                     .build();
             parkingAvailabilityRepository.save(parkingAvailability);
         }
+    }
+
+    public ParkingRegisterResponse EntitytoDto(Parking parking) {
+        return new ParkingRegisterResponse(parking,
+                parkingAvailabilityRepository.findByParkingId(parking.getId()),
+                parkingImageRepository.findByParkingId(parking.getId()));
     }
 }
