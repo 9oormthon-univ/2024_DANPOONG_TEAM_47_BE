@@ -6,6 +6,7 @@ import univ.goormthon.kongju.global.entity.BaseTimeEntity;
 
 @Getter
 @Entity
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
 
