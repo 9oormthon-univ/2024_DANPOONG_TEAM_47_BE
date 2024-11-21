@@ -2,7 +2,7 @@ package univ.goormthon.kongju.domain.parking.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import univ.goormthon.kongju.global.exception.InvalidDayException;
+import univ.goormthon.kongju.global.exception.InvalidDataException;
 import univ.goormthon.kongju.global.exception.dto.ErrorCode;
 
 @Getter
@@ -25,6 +25,6 @@ public enum AvailableDay {
                 return availableDay;
             }
         }
-        throw new InvalidDayException(ErrorCode.INVALID_DAY);
+        throw new InvalidDataException(ErrorCode.INVALID_DAY);
     }
 }
