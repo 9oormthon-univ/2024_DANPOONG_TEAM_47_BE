@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,9 @@ public class KakaoAuthController {
 
     private final KakaoAuthService kakaoAuthService;
     private final MemberService memberService;
+
+    @Value("${frontend.domain}")
+    private String frontendDomain;
 
     @Operation(summary = "카카오 로그인", description = "카카오 로그인")
     @ApiResponses(value = {
@@ -71,7 +75,7 @@ public class KakaoAuthController {
         session.setAttribute("member", member);
 
         // 메인으로 redirect
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/")).build();
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendDomain)).build();
     }
 
     // 로그아웃
