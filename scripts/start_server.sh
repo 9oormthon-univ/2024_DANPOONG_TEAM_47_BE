@@ -42,6 +42,9 @@ fi
 # JAR 파일 배포 및 실행
 DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
 echo ">>> DEPLOY_JAR 배포" >> $LOG_FILE
-nohup java -Dspring.profiles.active=prod -jar $DEPLOY_JAR >> $LOG_FILE 2>>$ERROR_LOG_FILE &
+nohup java -Dspring.config.location=${DEPLOY_PATH}application-prod.yml \
+-Dspring.profiles.active=prod \
+-jar ${DEPLOY_PATH}kongju-0.0.1-SNAPSHOT.jar >> $LOG_FILE 2>> $ERROR_LOG_FILE &
+
 
 echo ">>> 배포 완료. 애플리케이션이 prod 프로파일로 실행되었습니다." >> $LOG_FILE
