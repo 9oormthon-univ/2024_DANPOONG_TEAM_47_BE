@@ -25,6 +25,6 @@ public enum AvailableDay {
                 return availableDay;
             }
         }
-        throw new InvalidDataException(ErrorCode.INVALID_INPUT_VALUE);
+        throw new InvalidDataException(ErrorCode.INVALID_DAY);
     }
 }
