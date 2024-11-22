@@ -34,4 +34,9 @@ public class Vehicle {
         this.vehicleType = vehicleType;
         this.vehicleNumber = vehicleNumber;
     }
+
+    public void update(String type, String number) {
+        this.vehicleType = VehicleType.of(type);
+        this.vehicleNumber = number;
+    }
 }

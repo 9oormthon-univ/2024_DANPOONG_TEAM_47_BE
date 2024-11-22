@@ -13,6 +13,8 @@ import univ.goormthon.kongju.domain.vehicle.dto.response.VehicleResponse;
 import univ.goormthon.kongju.domain.vehicle.entity.Vehicle;
 import univ.goormthon.kongju.domain.vehicle.entity.VehicleType;
 import univ.goormthon.kongju.domain.vehicle.repository.VehicleRepository;
+import univ.goormthon.kongju.global.exception.NotFoundException;
+import univ.goormthon.kongju.global.exception.dto.ErrorCode;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,13 +24,12 @@ import java.util.stream.Collectors;
 public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
-    private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
-    public List<VehicleResponse> getVehiclesByMemberId(HttpSession session) {
+    public List<VehicleResponse> getVehicles(HttpSession session) {
         Member member = (Member) session.getAttribute("member");
 
-        List<Vehicle> vehicles = vehicleRepository.findAllByMemberId(member.getId());
+        List<Vehicle> vehicles = vehicleRepository.findAllByMember(member);
 
         return vehicles.stream()
                 .map(vehicle -> VehicleResponse.builder()
@@ -40,9 +41,11 @@ public class VehicleService {
     }
 
     @Transactional
-    public VehicleResponse addVehicle(Long memberId, VehicleRequest request) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
+    public VehicleResponse addVehicle(HttpSession session, VehicleRequest request) {
+        Member member = (Member) session.getAttribute("member");
+        if(member == null) {
+            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
+        }
 
         Vehicle vehicle = Vehicle.builder()
                 .member(member)
@@ -60,11 +63,16 @@ public class VehicleService {
     }
 
     @Transactional
-    public VehicleResponse updateVehicle(Long vehicleId, VehicleRequest requestDto) {
-        Vehicle vehicle = vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid vehicle ID"));
+    public VehicleResponse updateVehicle(HttpSession session, VehicleRequest request) {
+        Member member = (Member) session.getAttribute("member");
+        if(member == null) {
+            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
+        }
 
-        vehicle.update(requestDto.getVehicleType(), requestDto.getVehicleNumber());
+        Vehicle vehicle = vehicleRepository.findByMember(member)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.VEHICLE_NOT_FOUND));
+
+        vehicle.update(request.vehicleType(), request.vehicleNumber());
 
         return VehicleResponse.builder()
                 .id(vehicle.getId())
@@ -74,9 +82,14 @@ public class VehicleService {
     }
 
     @Transactional
-    public void deleteVehicle(Long vehicleId) {
+    public void deleteVehicle(HttpSession session, Long vehicleId) {
+        Member member = (Member) session.getAttribute("member");
+        if(member == null) {
+            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid vehicle ID"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.VEHICLE_NOT_FOUND));
 
         vehicleRepository.delete(vehicle);
     }
