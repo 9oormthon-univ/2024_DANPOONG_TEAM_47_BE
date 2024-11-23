@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import univ.goormthon.kongju.domain.member.entity.Member;
 import univ.goormthon.kongju.domain.member.service.MemberService;
 import univ.goormthon.kongju.global.auth.kakao.dto.KakaoProfileInfoResponse;
@@ -60,8 +57,8 @@ public class KakaoAuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "302", description = "메인으로 리다이렉트")
     })
-    @GetMapping("/auth/kakao/callback")
-    public ResponseEntity<?> kakaoCallback(@RequestParam("code") String code, HttpSession session) {
+    @PostMapping("/auth/token")
+    public ResponseEntity<?> kakaoCallback(@RequestBody String code, HttpSession session) {
         KakaoToken accessToken = kakaoAuthService.getAccessToken(code);
         log.info("accessToken: {}", accessToken.accessToken());
 
@@ -73,9 +70,9 @@ public class KakaoAuthController {
         log.info("member: {}", member);
 
         session.setAttribute("member", member);
-
         // 메인으로 redirect
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendDomain)).build();
+        // return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendDomain)).build();
+        return ResponseEntity.ok(session.getAttribute("member"));
     }
 
     // 로그아웃
