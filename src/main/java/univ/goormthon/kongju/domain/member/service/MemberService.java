@@ -56,8 +56,8 @@ public class MemberService {
     }
 
     @Transactional
-    public ProfileInfo getProfile(Member member) {
-        Member currentMember = memberRepository.findById(member.getId())
+    public ProfileInfo getProfile(String memberId) {
+        Member currentMember = memberRepository.findById(Long.parseLong(memberId))
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         return ProfileInfo.builder()

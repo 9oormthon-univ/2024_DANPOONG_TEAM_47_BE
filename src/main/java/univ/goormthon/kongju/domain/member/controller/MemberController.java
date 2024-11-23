@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import univ.goormthon.kongju.domain.member.dto.response.ProfileInfo;
 import univ.goormthon.kongju.domain.member.entity.Member;
@@ -33,11 +34,8 @@ public class MemberController {
 
     })
     @GetMapping("/profile")
-    public ResponseEntity<?> getProfile(HttpSession session) {
-
-        Member member = (Member) session.getAttribute("member");
-
-        ProfileInfo profileInfo = memberService.getProfile(member);
+    public ResponseEntity<?> getProfile(@RequestParam String memberId) {
+        ProfileInfo profileInfo = memberService.getProfile(memberId);
         return ResponseEntity.ok(profileInfo);
     }
 
