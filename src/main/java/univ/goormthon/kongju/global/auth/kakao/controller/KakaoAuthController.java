@@ -70,11 +70,8 @@ public class KakaoAuthController {
         log.info("member: {}", member);
 
         session.setAttribute("member", member);
-        String sessionId = session.getId();
 
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .header("Set-Cookie", "sessionId=" + sessionId + "; Path=/; HttpOnly; Max-Age=3600")
-                .location(URI.create(frontendDomain)).build();
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendDomain + "?id=" + member.getId())).build();
     }
 
     // 로그아웃
