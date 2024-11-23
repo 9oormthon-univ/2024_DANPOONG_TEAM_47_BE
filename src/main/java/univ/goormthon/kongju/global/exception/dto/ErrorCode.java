@@ -13,6 +13,7 @@ public enum ErrorCode {
     IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "주차장 이미지를 찾을 수 없습니다."),
     AVAILABILITY_NOT_FOUND(HttpStatus.NOT_FOUND, "날짜를 찾을 수 없습니다."),
     VEHICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "이동 수단을 찾을 수 없습니다."),
+    RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예약정보입니다."),
 
     INVALID_DAY(HttpStatus.BAD_REQUEST, "잘못된 요일입니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "잘못된 입력 값입니다."),
