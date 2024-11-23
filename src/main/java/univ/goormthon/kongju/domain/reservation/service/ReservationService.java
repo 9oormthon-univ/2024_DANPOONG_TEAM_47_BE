@@ -1,6 +1,5 @@
 package univ.goormthon.kongju.domain.reservation.service;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,8 +7,6 @@ import univ.goormthon.kongju.domain.member.entity.Member;
 import univ.goormthon.kongju.domain.member.repository.MemberRepository;
 import univ.goormthon.kongju.domain.parking.entity.Parking;
 import univ.goormthon.kongju.domain.parking.repository.ParkingRepository;
-import univ.goormthon.kongju.domain.payment.dto.response.PayReadyResponse;
-import univ.goormthon.kongju.domain.payment.service.KakaoPayService;
 import univ.goormthon.kongju.domain.reservation.dto.request.ReservationRequest;
 import univ.goormthon.kongju.domain.reservation.dto.response.ReservationResponse;
 import univ.goormthon.kongju.domain.reservation.entity.Reservation;
