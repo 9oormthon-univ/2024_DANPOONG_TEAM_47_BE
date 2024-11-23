@@ -5,8 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import univ.goormthon.kongju.domain.member.entity.Member;
+import univ.goormthon.kongju.domain.member.repository.MemberRepository;
 import univ.goormthon.kongju.domain.parking.entity.Parking;
 import univ.goormthon.kongju.domain.parking.repository.ParkingRepository;
+import univ.goormthon.kongju.domain.payment.dto.response.PayReadyResponse;
+import univ.goormthon.kongju.domain.payment.service.KakaoPayService;
 import univ.goormthon.kongju.domain.reservation.dto.request.ReservationRequest;
 import univ.goormthon.kongju.domain.reservation.dto.response.ReservationResponse;
 import univ.goormthon.kongju.domain.reservation.entity.Reservation;
@@ -27,13 +30,13 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ParkingRepository parkingRepository;
     private final VehicleRepository vehicleRepository;
+    private final MemberRepository memberRepository;
+    private final KakaoPayService kakaoPayService;
 
     @Transactional
-    public ReservationResponse reserve(HttpSession session, ReservationRequest request) {
-        Member member = (Member) session.getAttribute("member");
-        if (member == null) {
-            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
-        }
+    public ReservationResponse reserve(String memberId, ReservationRequest request) {
+        Member member = memberRepository.findById(Long.parseLong(memberId))
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         Parking parking = parkingRepository.findById(request.parkingId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PARKING_NOT_FOUND));
@@ -56,6 +59,17 @@ public class ReservationService {
 
         reservationRepository.save(reservation);
 
+        // 카카오페이 결제 성공 시 예약 상태 변경
+        PayReadyResponse response = kakaoPayService.ready(reservation, totalFee);
+        if(response != null) {
+            reservation.setReservationStatus(ReservationStatus.ACCEPTED);
+        }
+        else {
+            reservation.setReservationStatus(ReservationStatus.CANCELED);
+        }
+
+        reservationRepository.save(reservation);
+
         return ReservationResponse.builder()
                 .id(reservation.getId())
                 .parkingId(reservation.getParkingId())
@@ -69,75 +83,10 @@ public class ReservationService {
                 .build();
     }
 
-    @Transactional
-    public ReservationResponse cancel(HttpSession session, Long reservationId) {
-        Member member = (Member) session.getAttribute("member");
-        if (member == null) {
-            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
-        }
-
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.RESERVATION_NOT_FOUND));
-
-        if (!reservation.getMemberId().equals(member.getId())) {
-            throw new NotFoundException(ErrorCode.RESERVATION_NOT_FOUND);
-        }
-
-        reservation.setReservationStatus(ReservationStatus.CANCELED);
-        reservationRepository.save(reservation);
-
-        return ReservationResponse.builder()
-                .id(reservation.getId())
-                .parkingId(reservation.getParkingId())
-                .memberId(reservation.getMemberId())
-                .vehicleId(reservation.getVehicleId())
-                .reservationDate(reservation.getReservationDate().toString())
-                .startTime(reservation.getStartTime().toString())
-                .endTime(reservation.getEndTime().toString())
-                .reservationStatus(reservation.getReservationStatus().name())
-                .totalFee(reservation.getTotalFee())
-                .build();
-    }
-
-    @Transactional
-    public ReservationResponse accept(HttpSession session, Long reservationId) {
-        Member member = (Member) session.getAttribute("member");
-        if (member == null) {
-            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
-        }
-
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.RESERVATION_NOT_FOUND));
-
-        if (!reservation.getMemberId().equals(member.getId())) {
-            throw new NotFoundException(ErrorCode.RESERVATION_NOT_FOUND);
-        }
-
-        // 카카오페이 진행
-
-        // 예약 상태 변경
-        reservation.setReservationStatus(ReservationStatus.ACCEPTED);
-        reservationRepository.save(reservation);
-
-        return ReservationResponse.builder()
-                .id(reservation.getId())
-                .parkingId(reservation.getParkingId())
-                .memberId(reservation.getMemberId())
-                .vehicleId(reservation.getVehicleId())
-                .reservationDate(reservation.getReservationDate().toString())
-                .startTime(reservation.getStartTime().toString())
-                .endTime(reservation.getEndTime().toString())
-                .reservationStatus(reservation.getReservationStatus().name())
-                .totalFee(reservation.getTotalFee())
-                .build();
-    }
-
     @Transactional(readOnly = true)
-    public ReservationResponse getReservation(HttpSession session, Long reservationId) {
-        Member member = (Member) session.getAttribute("member");
-        if (member == null) {
-            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
-        }
+    public ReservationResponse getReservation(String memberId, Long reservationId) {
+        Member member = memberRepository.findById(Long.parseLong(memberId))
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.RESERVATION_NOT_FOUND));
@@ -160,11 +109,9 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationResponse> getReservations(HttpSession session) {
-        Member member = (Member) session.getAttribute("member");
-        if (member == null) {
-            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
-        }
+    public List<ReservationResponse> getReservations(String memberId) {
+        Member member = memberRepository.findById(Long.parseLong(memberId))
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         List<Reservation> reservations = reservationRepository.findByMemberId(member.getId());
 
