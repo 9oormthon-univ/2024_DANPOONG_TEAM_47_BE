@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,6 @@ import univ.goormthon.kongju.domain.parking.dto.request.ParkingRegisterRequest;
 import univ.goormthon.kongju.domain.parking.dto.response.ParkingRegisterResponse;
 import univ.goormthon.kongju.domain.parking.entity.Parking;
 import univ.goormthon.kongju.domain.parking.service.ParkingService;
-import univ.goormthon.kongju.global.exception.NotFoundException;
 import univ.goormthon.kongju.global.exception.dto.ErrorResponse;
 
 import java.util.List;
@@ -44,8 +42,22 @@ public class ParkingController {
         return ResponseEntity.ok(parkingService.getNearbyParkings(latitude, longitude, radius));
     }
 
+    @Operation(summary = "내 주차장 조회", description = "내가 등록한 주차장을 조회합니다.")
+    @Parameters(value = {
+            @Parameter(name = "memberId", description = "회원 ID")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "주차장 조회 성공", content = @Content(schema = @Schema(implementation = Parking.class))),
+            @ApiResponse(responseCode = "404", description = "주차장을 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/my")
+    public ResponseEntity<List<Parking>> getMyParkings(@RequestParam String memberId) {
+        return ResponseEntity.ok(parkingService.getMyParkings(memberId));
+    }
+
     @Operation(summary = "주차장 등록", description = "주차장을 등록합니다.")
     @Parameters(value = {
+            @Parameter(name = "memberId", description = "회원 ID"),
             @Parameter(name = "request", description = "주차장 등록 요청 JSON 형식의 데이터"),
             @Parameter(name = "images", description = "주차장 이미지 파일")
     })
@@ -56,16 +68,17 @@ public class ParkingController {
     })
     @PostMapping("/register")
     public ResponseEntity<ParkingRegisterResponse> registerParking(
-            HttpSession session,
+            @RequestParam String memberId,
             @RequestPart("request") ParkingRegisterRequest request,
             @RequestPart("images") List<MultipartFile> images) {
         request.setImages(images);
-        Parking parking = parkingService.registerParking(session, request);
+        Parking parking = parkingService.registerParking(memberId, request);
         return ResponseEntity.ok(parkingService.EntitytoDto(parking));
     }
 
     @Operation(summary = "주차장 수정", description = "주차장 정보를 수정합니다.")
     @Parameters(value = {
+            @Parameter(name = "memberId", description = "회원 ID"),
             @Parameter(name = "parkingId", description = "주차장 ID"),
             @Parameter(name = "request", description = "주차장 수정 요청 JSON 형식의 데이터"),
             @Parameter(name = "images", description = "주차장 이미지 파일")
@@ -77,16 +90,18 @@ public class ParkingController {
             @ApiResponse(responseCode = "404", description = "주차장을 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/update")
-    public ResponseEntity<ParkingRegisterResponse> updateParking(HttpSession session, @RequestParam Long parkingId,
+    public ResponseEntity<ParkingRegisterResponse> updateParking(@RequestParam String memberId,
+                                                                 @RequestParam Long parkingId,
                                                  @RequestPart("request") ParkingRegisterRequest request,
                                                  @RequestPart("images") List<MultipartFile> images) {
         request.setImages(images);
-        Parking updatedParking = parkingService.updateParking(session, parkingId, request);
+        Parking updatedParking = parkingService.updateParking(memberId, parkingId, request);
         return ResponseEntity.ok(parkingService.EntitytoDto(updatedParking));
     }
 
     @Operation(summary = "주차장 삭제", description = "주차장을 삭제합니다.")
     @Parameters(value = {
+            @Parameter(name = "memberId", description = "회원 ID"),
             @Parameter(name = "parkingId", description = "주차장 ID")
     })
     @ApiResponses(value = {
@@ -95,8 +110,9 @@ public class ParkingController {
             @ApiResponse(responseCode = "404", description = "주차장을 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteParking(HttpSession session, @RequestParam Long parkingId) {
-        parkingService.deleteParking(session, parkingId);
+    public ResponseEntity<Void> deleteParking(@RequestParam String memberId,
+                                              @RequestParam Long parkingId) {
+        parkingService.deleteParking(memberId, parkingId);
         return ResponseEntity.noContent().build();
     }
 }

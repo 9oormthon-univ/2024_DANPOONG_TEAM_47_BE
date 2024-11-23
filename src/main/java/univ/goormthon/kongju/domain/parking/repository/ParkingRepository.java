@@ -24,4 +24,6 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
     List<Parking> findAllWithinRadius(@Param("lat") double latitude,
                                       @Param("lng") double longitude,
                                       @Param("radius") double radius);
+
+    List<Parking> findAllByMemberId(long memberId);
 }
