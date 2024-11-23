@@ -73,20 +73,4 @@ public class KakaoAuthController {
 
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendDomain + "?id=" + member.getId())).build();
     }
-
-    // 로그아웃
-    @Operation(summary = "카카오 로그아웃", description = "카카오 로그아웃")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "302", description = "카카오 로그아웃창으로 리다이렉트")
-    })
-    @GetMapping("/logout")
-    public ResponseEntity<?> kakaoLogout() {
-        String kakaoLogoutUrl = "https://kauth.kakao.com/oauth/logout"
-                + "?client_id=" + kakaoAuthService.getClientId()
-                + "&logout_redirect_uri=" + kakaoAuthService.getLogoutRedirectUri();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create(kakaoLogoutUrl));
-        return ResponseEntity.status(HttpStatus.FOUND).headers(headers).build();
-    }
 }

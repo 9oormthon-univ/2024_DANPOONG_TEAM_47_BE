@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import univ.goormthon.kongju.domain.member.entity.Member;
+import univ.goormthon.kongju.domain.member.repository.MemberRepository;
 import univ.goormthon.kongju.domain.parking.dto.request.ParkingAvailabilityRequest;
 import univ.goormthon.kongju.domain.parking.dto.request.ParkingRegisterRequest;
 import univ.goormthon.kongju.domain.parking.dto.response.ParkingRegisterResponse;
@@ -31,6 +32,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ParkingService {
 
+    private final MemberRepository memberRepository;
     private final ParkingRepository parkingRepository;
     private final ParkingImageRepository parkingImageRepository;
     private final ParkingAvailabilityRepository parkingAvailabilityRepository;
@@ -41,9 +43,14 @@ public class ParkingService {
         return parkingRepository.findAllWithinRadius(latitude, longitude, radius);
     }
 
+    @Transactional(readOnly = true)
+    public List<Parking> getMyParkings(String memberId) {
+        return parkingRepository.findAllByMemberId(Long.parseLong(memberId));
+    }
+
     @Transactional
-    public Parking registerParking(HttpSession session, ParkingRegisterRequest request) {
-        Member member = validateMemberSession(session);
+    public Parking registerParking(String memberId, ParkingRegisterRequest request) {
+        Member member = validateMember(memberId);
 
         Parking parking = Parking.builder()
                 .member(member)
@@ -66,8 +73,8 @@ public class ParkingService {
     }
 
     @Transactional
-    public Parking updateParking(HttpSession session, Long parkingId, ParkingRegisterRequest request) {
-        Member member = validateMemberSession(session);
+    public Parking updateParking(String memberId, Long parkingId, ParkingRegisterRequest request) {
+        Member member = validateMember(memberId);
         Parking parking = validateParkingOwnership(parkingId, member);
 
         parking.update(request);
@@ -82,8 +89,8 @@ public class ParkingService {
     }
 
     @Transactional
-    public void deleteParking(HttpSession session, Long parkingId) {
-        Member member = validateMemberSession(session);
+    public void deleteParking(String memberId, Long parkingId) {
+        Member member = validateMember(memberId);
         Parking parking = validateParkingOwnership(parkingId, member);
 
         parkingImageRepository.deleteByParkingId(parkingId);
@@ -91,12 +98,9 @@ public class ParkingService {
         parkingRepository.delete(parking);
     }
 
-    private Member validateMemberSession(HttpSession session) {
-        Member member = (Member) session.getAttribute("member");
-        if (member == null) {
-            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
-        }
-        return member;
+    private Member validateMember(String memberId) {
+        return memberRepository.findById(Long.parseLong(memberId))
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     private Parking validateParkingOwnership(Long parkingId, Member member) {
