@@ -57,7 +57,7 @@ public class KakaoAuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "302", description = "메인으로 리다이렉트")
     })
-    @PostMapping("/auth/token")
+    @PostMapping("/auth/kakao/callback")
     public ResponseEntity<?> kakaoCallback(@RequestBody String code, HttpSession session) {
         KakaoToken accessToken = kakaoAuthService.getAccessToken(code);
         log.info("accessToken: {}", accessToken.accessToken());
@@ -71,8 +71,8 @@ public class KakaoAuthController {
 
         session.setAttribute("member", member);
         // 메인으로 redirect
-        // return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendDomain)).build();
-        return ResponseEntity.ok(session.getAttribute("member"));
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendDomain)).build();
+        // return ResponseEntity.ok(session.getAttribute("member"));
     }
 
     // 로그아웃
