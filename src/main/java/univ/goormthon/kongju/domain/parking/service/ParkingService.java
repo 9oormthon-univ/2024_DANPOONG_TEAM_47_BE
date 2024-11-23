@@ -1,6 +1,5 @@
 package univ.goormthon.kongju.domain.parking.service;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,7 +9,7 @@ import univ.goormthon.kongju.domain.member.entity.Member;
 import univ.goormthon.kongju.domain.member.repository.MemberRepository;
 import univ.goormthon.kongju.domain.parking.dto.request.ParkingAvailabilityRequest;
 import univ.goormthon.kongju.domain.parking.dto.request.ParkingRegisterRequest;
-import univ.goormthon.kongju.domain.parking.dto.response.ParkingRegisterResponse;
+import univ.goormthon.kongju.domain.parking.dto.response.ParkingResponse;
 import univ.goormthon.kongju.domain.parking.entity.AvailableDay;
 import univ.goormthon.kongju.domain.parking.entity.Parking;
 import univ.goormthon.kongju.domain.parking.entity.ParkingAvailability;
@@ -39,17 +38,23 @@ public class ParkingService {
     private final S3UploadService s3UploadService;
 
     @Transactional(readOnly = true)
-    public List<Parking> getNearbyParkings(Double latitude, Double longitude, Double radius) {
-        return parkingRepository.findAllWithinRadius(latitude, longitude, radius);
+    public List<ParkingResponse> getNearbyParkings(Double latitude, Double longitude, Double radius) {
+        List<Parking> parkings = parkingRepository.findAllWithinRadius(latitude, longitude, radius);
+        return parkings.stream()
+                .map(this::EntitytoDto)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Parking> getMyParkings(String memberId) {
-        return parkingRepository.findAllByMemberId(Long.parseLong(memberId));
+    public List<ParkingResponse> getMyParkings(String memberId) {
+        List<Parking> parkings = parkingRepository.findAllByMemberId(Long.parseLong(memberId));
+        return parkings.stream()
+                .map(this::EntitytoDto)
+                .toList();
     }
 
     @Transactional
-    public Parking registerParking(String memberId, ParkingRegisterRequest request) {
+    public ParkingResponse registerParking(String memberId, ParkingRegisterRequest request) {
         Member member = validateMember(memberId);
 
         Parking parking = Parking.builder()
@@ -69,11 +74,11 @@ public class ParkingService {
         uploadParkingImages(parking.getId(), request.getImages());
         saveParkingAvailabilities(parking.getId(), request.getAvailabilities());
 
-        return parking;
+        return EntitytoDto(parking);
     }
 
     @Transactional
-    public Parking updateParking(String memberId, Long parkingId, ParkingRegisterRequest request) {
+    public ParkingResponse updateParking(String memberId, Long parkingId, ParkingRegisterRequest request) {
         Member member = validateMember(memberId);
         Parking parking = validateParkingOwnership(parkingId, member);
 
@@ -85,7 +90,7 @@ public class ParkingService {
         parkingAvailabilityRepository.deleteByParkingId(parkingId);
         saveParkingAvailabilities(parkingId, request.getAvailabilities());
 
-        return parking;
+        return EntitytoDto(parking);
     }
 
     @Transactional
@@ -141,8 +146,8 @@ public class ParkingService {
         }
     }
 
-    public ParkingRegisterResponse EntitytoDto(Parking parking) {
-        return new ParkingRegisterResponse(parking,
+    public ParkingResponse EntitytoDto(Parking parking) {
+        return new ParkingResponse(parking,
                 parkingAvailabilityRepository.findByParkingId(parking.getId()),
                 parkingImageRepository.findByParkingId(parking.getId()));
     }

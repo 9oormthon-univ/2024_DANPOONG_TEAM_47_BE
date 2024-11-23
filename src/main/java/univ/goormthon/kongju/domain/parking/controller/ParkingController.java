@@ -13,8 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import univ.goormthon.kongju.domain.parking.dto.request.ParkingRegisterRequest;
-import univ.goormthon.kongju.domain.parking.dto.response.ParkingRegisterResponse;
-import univ.goormthon.kongju.domain.parking.entity.Parking;
+import univ.goormthon.kongju.domain.parking.dto.response.ParkingResponse;
 import univ.goormthon.kongju.domain.parking.service.ParkingService;
 import univ.goormthon.kongju.global.exception.dto.ErrorResponse;
 
@@ -34,9 +33,9 @@ public class ParkingController {
             @Parameter(name = "longitude", description = "경도"),
             @Parameter(name = "radius", description = "반경 (기본값: 0.5km)")
     })
-    @ApiResponse(responseCode = "200", description = "주차장 조회 성공", content = @Content(schema = @Schema(implementation = Parking.class)))
+    @ApiResponse(responseCode = "200", description = "주차장 조회 성공", content = @Content(schema = @Schema(implementation = ParkingResponse.class)))
     @GetMapping("/nearby")
-    public ResponseEntity<List<Parking>> getNearbyParkings(@RequestParam Double latitude,
+    public ResponseEntity<List<ParkingResponse>> getNearbyParkings(@RequestParam Double latitude,
                                                            @RequestParam Double longitude,
                                                            @RequestParam(defaultValue = "0.5") Double radius) {
         return ResponseEntity.ok(parkingService.getNearbyParkings(latitude, longitude, radius));
@@ -47,11 +46,11 @@ public class ParkingController {
             @Parameter(name = "memberId", description = "회원 ID")
     })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "주차장 조회 성공", content = @Content(schema = @Schema(implementation = Parking.class))),
+            @ApiResponse(responseCode = "200", description = "주차장 조회 성공", content = @Content(schema = @Schema(implementation = ParkingResponse.class))),
             @ApiResponse(responseCode = "404", description = "주차장을 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/my")
-    public ResponseEntity<List<Parking>> getMyParkings(@RequestParam String memberId) {
+    public ResponseEntity<List<ParkingResponse>> getMyParkings(@RequestParam String memberId) {
         return ResponseEntity.ok(parkingService.getMyParkings(memberId));
     }
 
@@ -62,18 +61,18 @@ public class ParkingController {
             @Parameter(name = "images", description = "주차장 이미지 파일")
     })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "주차장 등록 성공", content = @Content(schema = @Schema(implementation = ParkingRegisterResponse.class))),
+            @ApiResponse(responseCode = "200", description = "주차장 등록 성공", content = @Content(schema = @Schema(implementation = ParkingResponse.class))),
             @ApiResponse(responseCode = "404", description = "회원 세션이 존재하지 않음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "400", description = "이미지 업로드 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/register")
-    public ResponseEntity<ParkingRegisterResponse> registerParking(
+    public ResponseEntity<ParkingResponse> registerParking(
             @RequestParam String memberId,
             @RequestPart("request") ParkingRegisterRequest request,
             @RequestPart("images") List<MultipartFile> images) {
         request.setImages(images);
-        Parking parking = parkingService.registerParking(memberId, request);
-        return ResponseEntity.ok(parkingService.EntitytoDto(parking));
+        ParkingResponse response = parkingService.registerParking(memberId, request);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "주차장 수정", description = "주차장 정보를 수정합니다.")
@@ -84,19 +83,18 @@ public class ParkingController {
             @Parameter(name = "images", description = "주차장 이미지 파일")
     })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "주차장 수정 성공", content = @Content(schema = @Schema(implementation = ParkingRegisterResponse.class))),
+            @ApiResponse(responseCode = "200", description = "주차장 수정 성공", content = @Content(schema = @Schema(implementation = ParkingResponse.class))),
             @ApiResponse(responseCode = "400", description = "이미지 업로드 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "회원 세션이 존재하지 않음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "주차장을 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/update")
-    public ResponseEntity<ParkingRegisterResponse> updateParking(@RequestParam String memberId,
-                                                                 @RequestParam Long parkingId,
-                                                 @RequestPart("request") ParkingRegisterRequest request,
-                                                 @RequestPart("images") List<MultipartFile> images) {
+    public ResponseEntity<ParkingResponse> updateParking(@RequestParam String memberId,
+                                                         @RequestParam Long parkingId,
+                                                         @RequestPart("request") ParkingRegisterRequest request,
+                                                         @RequestPart("images") List<MultipartFile> images) {
         request.setImages(images);
-        Parking updatedParking = parkingService.updateParking(memberId, parkingId, request);
-        return ResponseEntity.ok(parkingService.EntitytoDto(updatedParking));
+        return ResponseEntity.ok(parkingService.updateParking(memberId, parkingId, request));
     }
 
     @Operation(summary = "주차장 삭제", description = "주차장을 삭제합니다.")

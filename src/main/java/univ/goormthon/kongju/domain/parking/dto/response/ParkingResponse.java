@@ -6,7 +6,7 @@ import univ.goormthon.kongju.domain.parking.entity.ParkingImage;
 
 import java.util.List;
 
-public record ParkingRegisterResponse(
+public record ParkingResponse(
         Parking parking,
         List<ParkingAvailability> availabilities,
         List<ParkingImage> images
