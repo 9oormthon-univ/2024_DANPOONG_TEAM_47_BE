@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +31,8 @@ public class VehicleController {
             @ApiResponse(responseCode = "404", description = "회원 세션이 존재하지 않음", content = @Content(schema = @Schema(implementation = VehicleResponse.class)))
     })
     @GetMapping("/list")
-    public ResponseEntity<List<VehicleResponse>> getVehicles(HttpSession session) {
-        return ResponseEntity.ok(vehicleService.getVehicles(session));
+    public ResponseEntity<List<VehicleResponse>> getVehicles(@RequestParam String memberId) {
+        return ResponseEntity.ok(vehicleService.getVehicles(memberId));
     }
 
     @Operation(summary = "이동 수단 추가", description = "현재 로그인한 회원의 이동 수단을 추가합니다.")
@@ -46,9 +45,9 @@ public class VehicleController {
             @ApiResponse(responseCode = "404", description = "회원 세션이 존재하지 않음", content = @Content(schema = @Schema(implementation = VehicleResponse.class)))
     })
     @PostMapping("/add")
-    public ResponseEntity<VehicleResponse> addVehicle(HttpSession session,
+    public ResponseEntity<VehicleResponse> addVehicle(@RequestParam String memberId,
                                                       @RequestBody VehicleRequest request) {
-        return ResponseEntity.ok(vehicleService.addVehicle(session, request));
+        return ResponseEntity.ok(vehicleService.addVehicle(memberId, request));
     }
 
     @Operation(summary = "이동 수단 수정", description = "현재 로그인한 회원의 이동 수단을 수정합니다.")
@@ -61,9 +60,9 @@ public class VehicleController {
             @ApiResponse(responseCode = "404", description = "회원 세션이 존재하지 않음", content = @Content(schema = @Schema(implementation = VehicleResponse.class)))
     })
     @PutMapping("/update")
-    public ResponseEntity<VehicleResponse> updateVehicle(HttpSession session,
+    public ResponseEntity<VehicleResponse> updateVehicle(@RequestParam String memberId,
                                                          @RequestBody VehicleRequest request) {
-        return ResponseEntity.ok(vehicleService.updateVehicle(session, request));
+        return ResponseEntity.ok(vehicleService.updateVehicle(memberId, request));
     }
 
     @Operation(summary = "이동 수단 삭제", description = "현재 로그인한 회원의 이동 수단을 삭제합니다.")
@@ -75,9 +74,9 @@ public class VehicleController {
             @ApiResponse(responseCode = "404", description = "회원 세션이 존재하지 않음")
     })
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteVehicle(HttpSession session,
+    public ResponseEntity<Void> deleteVehicle(@RequestParam String memberId,
                                               @RequestParam Long vehicleId) {
-        vehicleService.deleteVehicle(session, vehicleId);
+        vehicleService.deleteVehicle(memberId, vehicleId);
         return ResponseEntity.ok().build();
     }
 }
