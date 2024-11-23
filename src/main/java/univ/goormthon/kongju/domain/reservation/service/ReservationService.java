@@ -31,7 +31,6 @@ public class ReservationService {
     private final ParkingRepository parkingRepository;
     private final VehicleRepository vehicleRepository;
     private final MemberRepository memberRepository;
-    private final KakaoPayService kakaoPayService;
 
     @Transactional
     public ReservationResponse reserve(String memberId, ReservationRequest request) {
@@ -54,19 +53,8 @@ public class ReservationService {
                 .reservationDate(request.reservationDate())
                 .startTime(request.startTime())
                 .endTime(request.endTime())
-                .reservationStatus(ReservationStatus.WAITING)
+                .reservationStatus(ReservationStatus.ACCEPTED)
                 .build();
-
-        reservationRepository.save(reservation);
-
-        // 카카오페이 결제 성공 시 예약 상태 변경
-        PayReadyResponse response = kakaoPayService.ready(reservation, totalFee);
-        if(response != null) {
-            reservation.setReservationStatus(ReservationStatus.ACCEPTED);
-        }
-        else {
-            reservation.setReservationStatus(ReservationStatus.CANCELED);
-        }
 
         reservationRepository.save(reservation);
 
