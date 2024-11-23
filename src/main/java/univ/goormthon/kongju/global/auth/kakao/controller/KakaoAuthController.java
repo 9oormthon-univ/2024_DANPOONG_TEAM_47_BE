@@ -73,7 +73,8 @@ public class KakaoAuthController {
         String sessionId = session.getId();
 
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(frontendDomain + "/sessionId=" + sessionId)).build();
+                .header("Set-Cookie", "sessionId=" + sessionId + "; Path=/; HttpOnly; Max-Age=3600")
+                .location(URI.create(frontendDomain)).build();
     }
 
     // 로그아웃
