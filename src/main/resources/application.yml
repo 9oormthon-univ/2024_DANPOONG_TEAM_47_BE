@@ -17,6 +17,6 @@ server:
   servlet:
     session:
       cookie:
-        secure: false # HTTPS 사용 시 true
+        secure: true # HTTPS 사용 시 true
         http-only: true
         same-site: none # 다른 도메인 간 쿠키 전송 허용
