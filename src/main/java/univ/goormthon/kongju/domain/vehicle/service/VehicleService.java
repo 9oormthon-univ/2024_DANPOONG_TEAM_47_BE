@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import univ.goormthon.kongju.domain.member.entity.Member;
+import univ.goormthon.kongju.domain.member.repository.MemberRepository;
 import univ.goormthon.kongju.domain.vehicle.dto.request.VehicleRequest;
 import univ.goormthon.kongju.domain.vehicle.dto.response.VehicleResponse;
 import univ.goormthon.kongju.domain.vehicle.entity.Vehicle;
@@ -21,10 +22,12 @@ import java.util.stream.Collectors;
 public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
-    public List<VehicleResponse> getVehicles(HttpSession session) {
-        Member member = (Member) session.getAttribute("member");
+    public List<VehicleResponse> getVehicles(String memberId) {
+        Member member = memberRepository.findById(Long.parseLong(memberId))
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         List<Vehicle> vehicles = vehicleRepository.findAllByMember(member);
 
@@ -38,11 +41,9 @@ public class VehicleService {
     }
 
     @Transactional
-    public VehicleResponse addVehicle(HttpSession session, VehicleRequest request) {
-        Member member = (Member) session.getAttribute("member");
-        if(member == null) {
-            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
-        }
+    public VehicleResponse addVehicle(String memberId, VehicleRequest request) {
+        Member member = memberRepository.findById(Long.parseLong(memberId))
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         Vehicle vehicle = Vehicle.builder()
                 .member(member)
@@ -60,11 +61,9 @@ public class VehicleService {
     }
 
     @Transactional
-    public VehicleResponse updateVehicle(HttpSession session, VehicleRequest request) {
-        Member member = (Member) session.getAttribute("member");
-        if(member == null) {
-            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
-        }
+    public VehicleResponse updateVehicle(String memberId, VehicleRequest request) {
+        Member member = memberRepository.findById(Long.parseLong(memberId))
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         Vehicle vehicle = vehicleRepository.findByMember(member)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.VEHICLE_NOT_FOUND));
@@ -79,11 +78,9 @@ public class VehicleService {
     }
 
     @Transactional
-    public void deleteVehicle(HttpSession session, Long vehicleId) {
-        Member member = (Member) session.getAttribute("member");
-        if(member == null) {
-            throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
-        }
+    public void deleteVehicle(String memberId, Long vehicleId) {
+        Member member = memberRepository.findById(Long.parseLong(memberId))
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.VEHICLE_NOT_FOUND));
