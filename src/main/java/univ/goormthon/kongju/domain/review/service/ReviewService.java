@@ -10,11 +10,13 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
 
-    public ReviewResponse getAllReviews(String memberId) {
-        return ReviewResponse.builder()
-                .reviews(reviewRepository.findAllByMemberId(Long.parseLong(memberId)))
-                .build();
-    }
+    public void addReview() {}
+
+    public void getReviewFindByParkingId() {}
+
+    public void getReviewFindByMemberId() {}
+
+    public void deleteReview() {}
 
 
 }
