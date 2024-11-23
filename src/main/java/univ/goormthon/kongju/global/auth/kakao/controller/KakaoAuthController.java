@@ -58,7 +58,7 @@ public class KakaoAuthController {
             @ApiResponse(responseCode = "302", description = "메인으로 리다이렉트")
     })
     @GetMapping("/auth/kakao/callback")
-    public ResponseEntity<?> kakaoCallback(@RequestBody String code, HttpSession session) {
+    public ResponseEntity<?> kakaoCallback(@RequestParam String code, HttpSession session) {
         KakaoToken accessToken = kakaoAuthService.getAccessToken(code);
         log.info("accessToken: {}", accessToken.accessToken());
 
