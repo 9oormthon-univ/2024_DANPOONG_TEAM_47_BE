@@ -50,27 +50,27 @@ public class KakaoAuthController {
         return ResponseEntity.status(HttpStatus.FOUND).headers(headers).build();
     }
 
-    @Operation(summary = "카카오 로그인 콜백", description = "카카오 인증 서버로 code를 반환받고 code를 이용하여 access token을 발급받습니다.")
-    @Parameters(value = {
-            @Parameter(name = "code", description = "인가코드")
-    })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "302", description = "메인으로 리다이렉트")
-    })
-    @GetMapping("/auth/kakao/callback")
-    public ResponseEntity<?> kakaoCallback(@RequestParam String code, HttpSession session) {
-        KakaoToken accessToken = kakaoAuthService.getAccessToken(code);
-        log.info("accessToken: {}", accessToken.accessToken());
-
-        // 프로필 조회
-        KakaoProfileInfoResponse profileInfo = kakaoAuthService.getProfileInfo(accessToken.accessToken());
-        log.info("profileInfo: {}", profileInfo);
-
-        Member member = memberService.loadProfile(profileInfo);
-        log.info("member: {}", member);
-
-        session.setAttribute("member", member);
-
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendDomain + "?id=" + member.getId())).build();
-    }
+//    @Operation(summary = "카카오 로그인 콜백", description = "카카오 인증 서버로 code를 반환받고 code를 이용하여 access token을 발급받습니다.")
+//    @Parameters(value = {
+//            @Parameter(name = "code", description = "인가코드")
+//    })
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "302", description = "메인으로 리다이렉트")
+//    })
+//    @GetMapping("/auth/kakao/callback")
+//    public ResponseEntity<?> kakaoCallback(@RequestParam String code, HttpSession session) {
+//        KakaoToken accessToken = kakaoAuthService.getAccessToken(code);
+//        log.info("accessToken: {}", accessToken.accessToken());
+//
+//        // 프로필 조회
+//        KakaoProfileInfoResponse profileInfo = kakaoAuthService.getProfileInfo(accessToken.accessToken());
+//        log.info("profileInfo: {}", profileInfo);
+//
+//        Member member = memberService.loadProfile(profileInfo);
+//        log.info("member: {}", member);
+//
+//        session.setAttribute("member", member);
+//
+//        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendDomain + "?id=" + member.getId())).build();
+//    }
 }
