@@ -5,12 +5,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.web.SecurityFilterChain;
-import univ.goormthon.kongju.global.auth.CustomOAuth2UserService;
-import univ.goormthon.kongju.global.auth.CustomRequestEntityConverter;
+import univ.goormthon.kongju.global.oauth2.CustomOAuth2UserService;
+import univ.goormthon.kongju.global.oauth2.CustomRequestEntityConverter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -23,9 +24,11 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // 브라우저 환경이 아니므로 CSRF 보호 기능 비활성화
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/api/kongju/oauth2/**", "/api/kongju/auth/**").permitAll()
+                        .requestMatchers("/h2-console/**","/swagger-ui.html","/swagger-ui/**", "/api/kongju/oauth2/**", "/api/kongju/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService))

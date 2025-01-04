@@ -1,4 +1,4 @@
-package univ.goormthon.kongju.global.auth;
+package univ.goormthon.kongju.global.oauth2;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpHeaders;

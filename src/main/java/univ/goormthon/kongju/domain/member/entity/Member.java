@@ -29,12 +29,16 @@ public class Member extends BaseTimeEntity {
     @Setter
     private String profileImage;
 
+    @Column(name = "registration_id")
+    private String registrationId;
+
     @Builder
-    public Member(Long kakaoId, String nickname, String email, String profileImage) {
+    public Member(Long kakaoId, String nickname, String email, String profileImage, String registrationId) {
         this.kakaoId = kakaoId;
         this.nickname = nickname;
         this.email = email;
         this.profileImage = profileImage;
+        this.registrationId = registrationId;
     }
 
 }

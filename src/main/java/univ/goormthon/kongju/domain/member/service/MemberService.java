@@ -6,9 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import univ.goormthon.kongju.domain.member.dto.response.ProfileInfo;
 import univ.goormthon.kongju.domain.member.entity.Member;
 import univ.goormthon.kongju.domain.member.repository.MemberRepository;
-import univ.goormthon.kongju.global.auth.kakao.dto.KakaoProfileInfoResponse;
+import univ.goormthon.kongju.global.oauth2.kakao.dto.KakaoProfileInfoResponse;
 import univ.goormthon.kongju.global.exception.NotFoundException;
 import univ.goormthon.kongju.global.exception.dto.ErrorCode;
+
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +29,12 @@ public class MemberService {
                 .orElseGet(() -> registerMember(response));
     }
 
+    @Transactional
+    public Member findOrRegisterMember(String registrationId, Map<String, Object> attributes) {
+        return memberRepository.findByRegistrationIdAndEmail(registrationId, (String) attributes.get("email"))
+                .orElseGet(() -> registerMember(registrationId, attributes));
+    }
+
     private Member registerMember(KakaoProfileInfoResponse response) {
         Member member = Member.builder()
                 .kakaoId(response.id())
@@ -36,6 +44,22 @@ public class MemberService {
                 .build();
         return memberRepository.save(member);
     }
+
+    private Member registerMember(String registrationId, Map<String, Object> attributes) {
+        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+        Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
+
+        Member member = Member.builder()
+                .kakaoId(Long.valueOf(attributes.get("id").toString()))
+                .email((String) kakaoAccount.get("email"))
+                .nickname((String) properties.get("nickname"))
+                .profileImage((String) properties.get("profile_image"))
+                .registrationId(registrationId)
+                .build();
+
+        return memberRepository.save(member);
+    }
+
 
     private Member updateProfileIfChanged(Member member, KakaoProfileInfoResponse profileInfo) {
         boolean isChanged = false;

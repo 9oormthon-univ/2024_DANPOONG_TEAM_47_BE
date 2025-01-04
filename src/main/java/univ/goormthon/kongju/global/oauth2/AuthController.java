@@ -1,4 +1,4 @@
-package univ.goormthon.kongju.global.auth;
+package univ.goormthon.kongju.global.oauth2;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

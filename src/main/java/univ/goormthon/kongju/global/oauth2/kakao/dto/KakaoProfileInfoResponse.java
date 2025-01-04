@@ -1,4 +1,4 @@
-package univ.goormthon.kongju.global.auth.kakao.dto;
+package univ.goormthon.kongju.global.oauth2.kakao.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
