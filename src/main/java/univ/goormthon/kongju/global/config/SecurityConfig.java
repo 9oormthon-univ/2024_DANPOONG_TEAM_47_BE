@@ -6,10 +6,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import univ.goormthon.kongju.global.jwt.filter.JwtVerifyFilter;
 import univ.goormthon.kongju.global.oauth2.CustomOAuth2UserService;
 import univ.goormthon.kongju.global.oauth2.CustomRequestEntityConverter;
 
@@ -18,6 +21,7 @@ import univ.goormthon.kongju.global.oauth2.CustomRequestEntityConverter;
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final JwtVerifyFilter jwtVerifyFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -34,7 +38,10 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService))
                         .defaultSuccessUrl("/api/kongju/oauth2/success", true)
                         .tokenEndpoint(token -> token
-                                .accessTokenResponseClient(accessTokenResponseClient())));
+                                .accessTokenResponseClient(accessTokenResponseClient())))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtVerifyFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
