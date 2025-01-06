@@ -12,7 +12,7 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResp
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import univ.goormthon.kongju.global.jwt.filter.JwtVerifyFilter;
+import univ.goormthon.kongju.global.jwt.filter.JwtAuthenticationFilter;
 import univ.goormthon.kongju.global.oauth2.CustomOAuth2UserService;
 import univ.goormthon.kongju.global.oauth2.CustomRequestEntityConverter;
 
@@ -21,7 +21,7 @@ import univ.goormthon.kongju.global.oauth2.CustomRequestEntityConverter;
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final JwtVerifyFilter jwtVerifyFilter;
+    private final JwtAuthenticationFilter jwtVerifyFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
