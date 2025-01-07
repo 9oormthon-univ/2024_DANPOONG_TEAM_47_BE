@@ -9,7 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import univ.goormthon.kongju.global.jwt.provider.JwtProvider;
+import univ.goormthon.kongju.global.jwt.service.JwtProvider;
 
 import java.io.IOException;
 
