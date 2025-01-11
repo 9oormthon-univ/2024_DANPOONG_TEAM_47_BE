@@ -3,60 +3,44 @@ package univ.goormthon.kongju.global.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
-import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
-import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
-import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import univ.goormthon.kongju.global.jwt.filter.JwtAuthenticationFilter;
-import univ.goormthon.kongju.global.jwt.handler.CustomAuthenticationSuccessHandler;
-import univ.goormthon.kongju.global.oauth2.CustomOAuth2UserService;
-import univ.goormthon.kongju.global.oauth2.CustomRequestEntityConverter;
-import univ.goormthon.kongju.global.oauth2.filter.CustomAuthorizationRequestRedirectFilter;
+
+import javax.crypto.SecretKey;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final JwtAuthenticationFilter jwtVerifyFilter;
-    private final CustomAuthorizationRequestRedirectFilter customAuthorizationEndpointFilter;
-    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final SecretKey secretKey;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable) // 브라우저 환경이 아니므로 CSRF 보호 기능 비활성화
-                .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/favicon.ico", "/h2-console/**","/swagger-ui.html","/swagger-ui/**", "/api/kongju/oauth2/**", "/api/kongju/auth/**").permitAll()
+
+        // 브라우저 환경이 아니므로 CSRF, BASIC 인증, FormLogin 비활성화
+        http.csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable);
+
+        // 인증 경로 설정
+        http.authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/h2-console/**","/api/v1/jwt").permitAll()
                         .anyRequest().authenticated())
-                .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService))
-                        .successHandler(customAuthenticationSuccessHandler))
-//                        .tokenEndpoint(token -> token
-//                                .accessTokenResponseClient(accessTokenResponseClient())))
-                .addFilterBefore(customAuthorizationEndpointFilter, OAuth2AuthorizationRequestRedirectFilter.class)
-                .addFilterBefore(jwtVerifyFilter, UsernamePasswordAuthenticationFilter.class);
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
+
+        // OAuth2 Resource Server 설정
+        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+
         return http.build();
     }
 
     @Bean
-    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
-        DefaultAuthorizationCodeTokenResponseClient client = new DefaultAuthorizationCodeTokenResponseClient();
-        client.setRequestEntityConverter(customRequestEntityConverter());
-        return client;
+    public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withSecretKey(this.secretKey).build();
     }
-
-    @Bean
-    public CustomRequestEntityConverter customRequestEntityConverter() {
-        return new CustomRequestEntityConverter();
-    }
-
 }
