@@ -1,55 +1,83 @@
 package univ.goormthon.kongju.global.jwt.service;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import univ.goormthon.kongju.domain.member.entity.Member;
+import univ.goormthon.kongju.domain.member.service.MemberService;
+import univ.goormthon.kongju.global.jwt.dto.request.TokenRequest;
+import univ.goormthon.kongju.global.jwt.dto.response.TokenResponse;
 
 import javax.crypto.SecretKey;
-import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
-@Component
+@Service
 public class JwtProvider {
+    private final SecretKey secretKey = Jwts.SIG.HS256.key().build();
+    private final MemberService memberService;
+    private final WebClient webClient;
 
-    private final SecretKey key = Jwts.SIG.HS256.key().build();
-    private final long validityInMilliseconds = 1000 * 60 * 60; // 1시간
+    public JwtProvider(MemberService memberService, WebClient.Builder webClientBuilder) {
+        this.memberService = memberService;
+        this.webClient = webClientBuilder.baseUrl("https://kapi.kakao.com").build();
+    }
 
-    public String generateToken(Authentication authentication) {
-        String email = authentication.getName();
+    @Bean
+    public SecretKey secretKey() {
+        return this.secretKey;
+    }
+
+    public TokenResponse issueJwtToken(TokenRequest tokenRequest) {
+        String accessToken = generateAccessToken(tokenRequest.accessToken());
+        String refreshToken = generateRefreshToken();
+
+        return TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+
+    private String generateAccessToken(String kakaoAccessToken) {
+        String email = extractEmailFromKakaoAccessToken(kakaoAccessToken);
 
         return Jwts.builder()
-                .subject(email)
-                .signWith(key)
+                .issuer("shared-parking-service-Kongju")
                 .issuedAt(new Date())
-                .expiration(new Date(new Date().getTime() + validityInMilliseconds))
+                .expiration(new Date(System.currentTimeMillis() + 3600 * 1000)) // 1시간
+                .subject(email)
+                .signWith(secretKey)
                 .compact();
+
     }
 
-    public Claims getClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+    private String extractEmailFromKakaoAccessToken(String kakaoAccessToken) {
+        var response = webClient.get()
+                .uri("/v2/user/me")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + kakaoAccessToken)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
+
+        // 이메일 추출
+        Map<String, Object> kakaoAccount = (Map<String, Object>) response.get("kakao_account");
+        String email = (String) kakaoAccount.get("email");
+
+        Member member = memberService.findOrRegisterMember(email, response);
+
+        return email;
     }
 
-    public boolean validateToken(String token) {
-        try {
-            Claims claims = getClaims(token);
-            Date expiration = claims.getExpiration();
-            return expiration.after(new Date());
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public Authentication getAuthentication(String token) {
-        Claims claims = getClaims(token);
-        String email = claims.getSubject();
-
-        return new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
+    private String generateRefreshToken() {
+        return Jwts.builder()
+                .issuer("shared-parking-service-Kongju")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 3600 * 1000 * 24 * 7)) // 1주일
+                .signWith(secretKey)
+                .compact();
     }
 
 }
