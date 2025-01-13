@@ -38,8 +38,8 @@ public class MemberService {
     }
 
     @Transactional
-    public ProfileInfo getProfile(String memberId) {
-        Member currentMember = memberRepository.findById(Long.parseLong(memberId))
+    public ProfileInfo getProfile(String email) {
+        Member currentMember = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         return ProfileInfo.builder()
