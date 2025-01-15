@@ -1,4 +1,4 @@
-## 공유 주차장 서비스 - 공주 Backend Repository
+## 공유 주차장 서비스 - 공주 API Server Repository
 ![1](https://github.com/user-attachments/assets/bcc6c3a8-ab32-406b-95c4-624f9dad8932)
 
 
@@ -15,3 +15,13 @@
 | **`test`**      | 테스트 코드 추가/수정                                      | 
 | **`perf`**      | 성능 개선                                                 | 
 
+### 기술 스택
+- Spring Boot 3.3.5
+- Java 17
+- Spring Security 6.3.4
+- JJWT
+- AWS S3
+- AWS CodeDeploy
+- AWS EC2
+- MySQL
+- Github Actions
