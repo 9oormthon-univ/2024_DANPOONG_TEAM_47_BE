@@ -1,9 +1,11 @@
 package univ.goormthon.kongju.global.jwt.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 
 import java.util.List;
 
+@Builder
 public record TokenRequest(
         @JsonProperty("accessToken") String accessToken,
         @JsonProperty("refreshToken") String refreshToken,
