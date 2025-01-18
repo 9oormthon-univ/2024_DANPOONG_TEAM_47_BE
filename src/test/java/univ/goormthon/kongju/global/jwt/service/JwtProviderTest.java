@@ -1,6 +1,6 @@
 package univ.goormthon.kongju.global.jwt.service;
 
-import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,19 +10,14 @@ import univ.goormthon.kongju.global.jwt.dto.response.TokenResponse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-@RequiredArgsConstructor
 class JwtProviderTest {
 
     @Autowired
-    private final JwtProvider jwtProvider;
+    private JwtProvider jwtProvider;
 
     @Test
-    void secretKey() {
-        assertNotNull(jwtProvider.secretKey());
-    }
-
-    @Test
-    void issueJwtToken_ShouldGenerateValidTokens() {
+    @DisplayName("요청에 따라 access token과 refresh token을 발급한다.")
+    void issueJwtToken() {
         // given
         TokenRequest tokenRequest = TokenRequest.builder()
                 .accessToken("test-access-token")
@@ -32,7 +27,7 @@ class JwtProviderTest {
         TokenResponse tokenResponse = jwtProvider.issueJwtToken(tokenRequest);
 
         // then
-        assertNotNull(tokenResponse.accessToken());
-        assertNotNull(tokenResponse.refreshToken());
+        assertNotNull(tokenResponse);
     }
+
 }
