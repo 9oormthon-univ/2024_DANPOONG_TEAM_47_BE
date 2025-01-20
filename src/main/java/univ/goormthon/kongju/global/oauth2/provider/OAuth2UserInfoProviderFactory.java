@@ -2,6 +2,8 @@ package univ.goormthon.kongju.global.oauth2.provider;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import univ.goormthon.kongju.global.exception.UnsupportedProviderException;
+import univ.goormthon.kongju.global.exception.dto.ErrorCode;
 
 import java.util.List;
 
@@ -15,7 +17,7 @@ public class OAuth2UserInfoProviderFactory {
         return providers.stream()
                 .filter(provider -> provider.getProviderName().equalsIgnoreCase(providerName))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unsupported provider: " + providerName));
+                .orElseThrow(() -> new UnsupportedProviderException(ErrorCode.UNSUPPORTED_PROVIDER));
     }
 }
 

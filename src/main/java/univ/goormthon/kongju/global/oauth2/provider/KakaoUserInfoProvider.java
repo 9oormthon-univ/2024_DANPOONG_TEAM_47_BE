@@ -17,12 +17,23 @@ public class KakaoUserInfoProvider implements OAuth2UserInfoProvider {
 
     @Override
     public Map<String, Object> getUserInfo(String accessToken) {
-        return webClient.get()
+        var response = webClient.get()
                 .uri("/v2/user/me")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
+
+        // 카카오 사용자 정보 변환
+        Map<String, Object> kakaoAccount = (Map<String, Object>) response.get("kakao_account");
+        Map<String, Object> properties = (Map<String, Object>) response.get("properties");
+
+        return Map.of(
+                "id", response.get("id"),
+                "email", kakaoAccount.get("email"),
+                "nickname", properties.get("nickname"),
+                "profile_image", properties.get("profile_image")
+        );
     }
 
     @Override
