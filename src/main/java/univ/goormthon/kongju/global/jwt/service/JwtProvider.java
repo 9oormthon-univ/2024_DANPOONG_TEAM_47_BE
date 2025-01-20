@@ -1,37 +1,21 @@
 package univ.goormthon.kongju.global.jwt.service;
 
 import io.jsonwebtoken.Jwts;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpHeaders;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import univ.goormthon.kongju.domain.member.entity.Member;
-import univ.goormthon.kongju.domain.member.service.MemberService;
-import univ.goormthon.kongju.global.jwt.dto.request.TokenRequest;
 import univ.goormthon.kongju.global.jwt.dto.response.TokenResponse;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class JwtProvider {
-    private final SecretKey secretKey = Jwts.SIG.HS256.key().build();
-    private final MemberService memberService;
-    private final WebClient webClient;
 
-    public JwtProvider(MemberService memberService, WebClient.Builder webClientBuilder) {
-        this.memberService = memberService;
-        this.webClient = webClientBuilder.baseUrl("https://kapi.kakao.com").build();
-    }
+    private final SecretKey secretKey;
 
-    @Bean
-    public SecretKey secretKey() {
-        return this.secretKey;
-    }
-
-    public TokenResponse issueJwtToken(TokenRequest tokenRequest) {
-        String accessToken = generateAccessToken(tokenRequest.accessToken());
+    public TokenResponse issueJwtToken(String email) {
+        String accessToken = generateAccessToken(email);
         String refreshToken = generateRefreshToken();
 
         return TokenResponse.builder()
@@ -41,9 +25,7 @@ public class JwtProvider {
     }
 
 
-    private String generateAccessToken(String kakaoAccessToken) {
-        String email = extractEmailFromKakaoAccessToken(kakaoAccessToken);
-
+    private String generateAccessToken(String email) {
         return Jwts.builder()
                 .issuer("shared-parking-service-Kongju")
                 .issuedAt(new Date())
@@ -52,23 +34,6 @@ public class JwtProvider {
                 .signWith(secretKey)
                 .compact();
 
-    }
-
-    private String extractEmailFromKakaoAccessToken(String kakaoAccessToken) {
-        var response = webClient.get()
-                .uri("/v2/user/me")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + kakaoAccessToken)
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
-
-        // 이메일 추출
-        Map<String, Object> kakaoAccount = (Map<String, Object>) response.get("kakao_account");
-        String email = (String) kakaoAccount.get("email");
-
-        Member member = memberService.findOrRegisterMember(email, response);
-
-        return email;
     }
 
     private String generateRefreshToken() {
