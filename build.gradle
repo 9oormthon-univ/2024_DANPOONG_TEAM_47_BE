@@ -62,6 +62,6 @@ dependencyManagement {
     }
 }
 
-tasks.named('test') {
-    enabled = false
+test {
+    useJUnitPlatform()
 }

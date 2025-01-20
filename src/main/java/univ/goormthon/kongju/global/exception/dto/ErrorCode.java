@@ -19,6 +19,7 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "잘못된 입력 값입니다."),
     FAILED_TO_RESERVE(HttpStatus.BAD_REQUEST, "예약에 실패했습니다."),
     FAILED_TO_UPLOAD(HttpStatus.BAD_REQUEST, "이미지 업로드에 실패했습니다."),
+    UNSUPPORTED_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 소셜 서비스 로그인입니다."),
 
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "서비스 회원이 아닙니다.");
 

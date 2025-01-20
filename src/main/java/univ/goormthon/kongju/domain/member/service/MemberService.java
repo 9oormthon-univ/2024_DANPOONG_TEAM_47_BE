@@ -18,20 +18,17 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Member findOrRegisterMember(String email, Map<String, Object> attributes) {
-        return memberRepository.findByEmail(email)
-                .orElseGet(() -> registerMember(attributes));
+    public Member findOrRegisterMember(Map<String, Object> userInfo) {
+        return memberRepository.findByEmail((String) userInfo.get("email"))
+                .orElseGet(() -> registerMember(userInfo));
     }
 
-    private Member registerMember(Map<String, Object> attributes) {
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-        Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
-
+    private Member registerMember(Map<String, Object> userInfo) {
         Member member = Member.builder()
-                .kakaoId(Long.valueOf(attributes.get("id").toString()))
-                .email((String) kakaoAccount.get("email"))
-                .nickname((String) properties.get("nickname"))
-                .profileImage((String) properties.get("profile_image"))
+                .kakaoId(Long.valueOf(userInfo.get("id").toString()))
+                .email((String) userInfo.get("email"))
+                .nickname((String) userInfo.get("nickname"))
+                .profileImage((String) userInfo.get("profile_image"))
                 .build();
 
         return memberRepository.save(member);
