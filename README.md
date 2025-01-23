@@ -1,6 +1,14 @@
 ## 공유 주차장 서비스 - 공주 API Server Repository
 ![1](https://github.com/user-attachments/assets/bcc6c3a8-ab32-406b-95c4-624f9dad8932)
+<hr>
 
+### Server Architecture
+![image](https://github.com/user-attachments/assets/286fc728-745c-4120-acca-449fa7fa0b6e)
+
+- Frontend : React Native
+- Backend : Spring Boot
+- Proxy : Nginx
+- CI/CD : Github Actions, AWS S3, AWS EC2, AWS CodeDeploy
 
 ### Commit Message Prefix
 
