@@ -33,3 +33,6 @@
 - AWS EC2
 - MySQL
 - Github Actions
+
+### 로그인 처리 방법
+- React Native의 Kakao SDK를 사용하여 로그인을 진행하고, 카카오로부터 받은 access token을 이용하여 서버에서 자체적으로 JWT를 발급
