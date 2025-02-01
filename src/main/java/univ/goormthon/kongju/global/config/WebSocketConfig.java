@@ -21,11 +21,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // destination header가 /app으로 시작하는 메시지는 @MessageMapping으로 라우팅
-        registry.setApplicationDestinationPrefixes("/app");
+        // destination header가 /pub으로 시작하는 메시지는 @MessageMapping으로 라우팅
+        registry.setApplicationDestinationPrefixes("/pub");
 
-        // destination header가 /topic으로 시작하는 메시지는 in-memory message broker로 라우팅
-        registry.enableSimpleBroker("/topic");
+        // destination header가 /sub으로 시작하는 메시지는 in-memory message broker로 라우팅
+        registry.enableSimpleBroker("/sub");
     }
 
     @Bean
