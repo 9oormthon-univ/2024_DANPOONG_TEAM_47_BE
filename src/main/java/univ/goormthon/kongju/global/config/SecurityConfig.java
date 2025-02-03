@@ -29,7 +29,7 @@ public class SecurityConfig {
 
         // 인증 경로 설정
         http.authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/h2-console/**","/api/v1/auth/**").permitAll()
+                        .requestMatchers("/ws/chat","/h2-console/**","/api/v1/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
 
