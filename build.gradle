@@ -8,8 +8,10 @@ ext {
     springCloudVersion = "2023.0.3"
 }
 
-group = 'univ.goormthon'
-version = '0.0.1-SNAPSHOT'
+allprojects {
+    group = 'univ.goormthon'
+    version = '0.0.1-SNAPSHOT'
+}
 
 java {
     toolchain {
@@ -20,6 +22,32 @@ java {
 configurations {
     implementation {
         extendsFrom annotationProcessor
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+        }
+    }
+
+    test {
+        useJUnitPlatform()
     }
 }
 
@@ -61,8 +89,4 @@ dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
     }
-}
-
-test {
-    useJUnitPlatform()
 }
