@@ -1,6 +1,8 @@
 package univ.goormthon.kongju.client.provider;
 
 import org.springframework.stereotype.Component;
+import univ.goormthon.kongju.exception.UnsupportedProviderException;
+import univ.goormthon.kongju.exception.dto.ErrorCode;
 
 import java.util.List;
 
