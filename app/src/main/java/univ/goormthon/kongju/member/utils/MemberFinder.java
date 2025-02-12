@@ -21,7 +21,11 @@ public class MemberFinder {
     public Member findByEmail(String email) {
         MemberEntity member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
         return Member.of(member);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isExistByEmail(String email) {
+        return memberRepository.existsByEmail(email);
     }
 }

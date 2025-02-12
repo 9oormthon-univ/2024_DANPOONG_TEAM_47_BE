@@ -13,26 +13,22 @@ public class MemberEntity extends BaseTimeEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @Column(name = "kakao_id")
-    private Long kakaoId;
-
     @Column(name = "nickname")
     private String nickname;
 
     @Column(name = "email")
     private String email;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(name = "profile_image")
+    private String profileImage;
 
     public MemberEntity() {
     }
 
     @Builder
-    public MemberEntity(Long kakaoId, String nickname, String email, String imageUrl) {
-        this.kakaoId = kakaoId;
+    public MemberEntity(String nickname, String email, String profileImage) {
         this.nickname = nickname;
         this.email = email;
-        this.imageUrl = imageUrl;
+        this.profileImage = profileImage;
     }
 }

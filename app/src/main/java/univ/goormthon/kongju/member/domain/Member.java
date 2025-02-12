@@ -11,24 +11,23 @@ public class Member {
     private Long kakaoId;
     private String nickname;
     private String email;
-    private String imageUrl;
+    private String profileImage;
 
     @Builder
-    public Member(Long id, Long kakaoId, String nickname, String email, String imageUrl) {
+    public Member(Long id, Long kakaoId, String nickname, String email, String profileImage) {
         this.id = id;
         this.kakaoId = kakaoId;
         this.nickname = nickname;
         this.email = email;
-        this.imageUrl = imageUrl;
+        this.profileImage = profileImage;
     }
 
     public static Member of(MemberEntity memberEntity) {
         return Member.builder()
                 .id(memberEntity.getId())
-                .kakaoId(memberEntity.getKakaoId())
                 .nickname(memberEntity.getNickname())
                 .email(memberEntity.getEmail())
-                .imageUrl(memberEntity.getImageUrl())
+                .profileImage(memberEntity.getProfileImage())
                 .build();
     }
 }
