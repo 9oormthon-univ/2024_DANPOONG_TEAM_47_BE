@@ -1,4 +1,4 @@
 dependencies {
     implementation(project(":core:core-global"))
-    implementation(project(":domain"))
+    implementation(project(":infra"))
 }
