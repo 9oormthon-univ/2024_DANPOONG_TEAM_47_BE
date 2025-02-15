@@ -1,6 +1,7 @@
 package univ.goormthon.kongju.auth;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import univ.goormthon.kongju.auth.dto.TokenRequest;
@@ -30,6 +31,26 @@ public class AuthController {
         Member member = memberService.getMember(userInfo);
 
         return ResponseEntity.ok(TokenResponse.builder()
-                .accessToken(jwtProvider.issueAccessToken(member.getEmail())).build());
+                .accessToken(jwtProvider.issueAccessToken(member.getEmail()))
+                .refreshToken(jwtProvider.issueRefreshToken(member.getEmail()))
+                .build());
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refresh(@RequestBody TokenRequest tokenRequest) {
+        String refreshToken = tokenRequest.refreshToken();
+        if (!jwtProvider.isRefreshTokenValid(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String email = jwtProvider.getEmailFromToken(refreshToken);
+
+        // 기존 refresh token 만료
+        jwtProvider.invalidateRefreshToken(email);
+
+        return ResponseEntity.ok(TokenResponse.builder()
+                .accessToken(jwtProvider.issueAccessToken(email))
+                .refreshToken(jwtProvider.issueRefreshToken(email))
+                .build());
     }
 }
