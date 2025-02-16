@@ -4,3 +4,6 @@ dependencies {
 
     implementation(project(":app"))
 }
+
+bootJar.enabled = true
+jar.enabled = false
