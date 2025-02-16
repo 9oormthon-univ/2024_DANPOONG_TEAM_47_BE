@@ -1,1 +1,8 @@
 rootProject.name = 'kongju'
+
+include ':core'
+include ':core:core-security'
+include ':core:core-global'
+include ':api'
+include ':app'
+include ':infra'

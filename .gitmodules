@@ -1,0 +1,3 @@
+[submodule "api/src/main/resources/secrets"]
+	path = api/src/main/resources/secrets
+	url = https://github.com/BinarySstar/BinarySstar-shared-parking-service-kongju-private-repo.git

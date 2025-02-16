@@ -1,0 +1,9 @@
+dependencies {
+    implementation(project(":core:core-global"))
+    implementation(project(":core:core-security"))
+
+    implementation(project(":app"))
+}
+
+bootJar.enabled = true
+jar.enabled = false
