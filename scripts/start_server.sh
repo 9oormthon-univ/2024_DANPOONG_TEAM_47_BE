@@ -5,21 +5,22 @@ DEPLOY_PATH="/home/ubuntu/spring_server/"
 
 LOG_FILE="${DEPLOY_PATH}deploy.log"
 ERROR_LOG_FILE="${DEPLOY_PATH}deploy_err.log"
-S3_BUCKET="kongju-s3-bucket"
+GIT_SUBMODULE_PATH="${DEPLOY_PATH}api/src/main/resources/secrets/"  # 실제 Git submodule 경로로 설정
 
 echo ">>> 배포 스크립트 시작" >> $LOG_FILE
 
-# S3에서 application-prod.yml 다운로드
-echo ">>> S3에서 application-prod.yml 다운로드" >> $LOG_FILE
-aws s3 cp s3://${S3_BUCKET}/application-prod.yml ${DEPLOY_PATH}
+# Git submodule 업데이트
+echo ">>> Git submodule 업데이트 시작" >> $LOG_FILE
+cd $DEPLOY_PATH
+git submodule update --init --recursive
 if [ $? -ne 0 ]; then
-  echo ">>> application-prod.yml 다운로드 실패" >> $LOG_FILE
+  echo ">>> Git submodule 업데이트 실패" >> $LOG_FILE
   exit 1
 fi
-echo ">>> application-prod.yml 다운로드 완료" >> $LOG_FILE
+echo ">>> Git submodule 업데이트 완료" >> $LOG_FILE
 
 # 빌드된 JAR 파일 경로 및 이름 (실행 가능한 JAR만 선택)
-BUILD_JAR=$(ls ${DEPLOY_PATH}build/libs/*SNAPSHOT.jar | grep -v plain)
+BUILD_JAR=$(ls ${DEPLOY_PATH}api/build/libs/*SNAPSHOT.jar | grep -v plain)
 JAR_NAME=$(basename $BUILD_JAR)
 echo ">>> build 파일명: $JAR_NAME" >> $LOG_FILE
 
@@ -44,7 +45,6 @@ DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
 echo ">>> DEPLOY_JAR 배포" >> $LOG_FILE
 nohup java -Dspring.config.location=${DEPLOY_PATH}application-prod.yml \
 -Dspring.profiles.active=prod \
--jar ${DEPLOY_PATH}kongju-0.0.1-SNAPSHOT.jar >> $LOG_FILE 2>> $ERROR_LOG_FILE &
-
+-jar ${DEPLOY_PATH}*SNAPSHOT.jar >> $LOG_FILE 2>> $ERROR_LOG_FILE &
 
 echo ">>> 배포 완료. 애플리케이션이 prod 프로파일로 실행되었습니다." >> $LOG_FILE
