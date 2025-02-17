@@ -5,19 +5,8 @@ DEPLOY_PATH="/home/ubuntu/spring_server/"
 
 LOG_FILE="${DEPLOY_PATH}deploy.log"
 ERROR_LOG_FILE="${DEPLOY_PATH}deploy_err.log"
-GIT_SUBMODULE_PATH="${DEPLOY_PATH}api/src/main/resources/secrets/"  # 실제 Git submodule 경로로 설정
 
 echo ">>> 배포 스크립트 시작" >> $LOG_FILE
-
-# Git submodule 업데이트
-echo ">>> Git submodule 업데이트 시작" >> $LOG_FILE
-cd $DEPLOY_PATH
-git submodule update --init --recursive
-if [ $? -ne 0 ]; then
-  echo ">>> Git submodule 업데이트 실패" >> $LOG_FILE
-  exit 1
-fi
-echo ">>> Git submodule 업데이트 완료" >> $LOG_FILE
 
 # 빌드된 JAR 파일 경로 및 이름 (실행 가능한 JAR만 선택)
 BUILD_JAR=$(ls ${DEPLOY_PATH}api/build/libs/*SNAPSHOT.jar | grep -v plain)
