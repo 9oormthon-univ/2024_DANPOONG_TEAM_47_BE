@@ -25,4 +25,5 @@ public interface ParkingRepository extends JpaRepository<ParkingEntity, Long> {
                                       @Param("lng") double longitude,
                                       @Param("radius") double radius);
 
+    List<ParkingEntity> findAllByMemberId(Long memberId);
 }

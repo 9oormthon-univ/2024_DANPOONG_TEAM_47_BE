@@ -22,4 +22,10 @@ public class ParkingFinder {
                 .map(Parking::of)
                 .toList();
     }
+
+    public List<Parking> getMyParkings(Long memberId) {
+        return parkingRepository.findAllByMemberId(memberId).stream()
+                .map(Parking::of)
+                .toList();
+    }
 }

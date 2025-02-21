@@ -1,6 +1,7 @@
 package univ.goormthon.kongju.parking.service;
 
 import org.springframework.stereotype.Service;
+import univ.goormthon.kongju.member.domain.Member;
 import univ.goormthon.kongju.parking.domain.Parking;
 import univ.goormthon.kongju.parking.utils.ParkingFinder;
 
@@ -19,4 +20,7 @@ public class ParkingService {
         return parkingFinder.getNearByParkings(latitude, longitude, radius);
     }
 
+    public List<Parking> getMyParkings(Member member) {
+        return parkingFinder.getMyParkings(member.getId());
+    }
 }
