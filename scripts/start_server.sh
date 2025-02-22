@@ -32,7 +32,7 @@ fi
 # JAR 파일 배포 및 실행
 DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
 echo ">>> DEPLOY_JAR 배포" >> $LOG_FILE
-nohup java -Dspring.config.location=${DEPLOY_PATH}application-prod.yml \
+nohup java \
 -Dspring.profiles.active=prod \
 -jar ${DEPLOY_PATH}*SNAPSHOT.jar >> $LOG_FILE 2>> $ERROR_LOG_FILE &
 
