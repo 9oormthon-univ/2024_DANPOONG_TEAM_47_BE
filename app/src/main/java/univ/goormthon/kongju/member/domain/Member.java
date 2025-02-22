@@ -30,4 +30,12 @@ public class Member {
                 .profileImage(memberEntity.getProfileImage())
                 .build();
     }
+
+    public MemberEntity toEntity() {
+        return MemberEntity.builder()
+                .nickname(nickname)
+                .email(email)
+                .profileImage(profileImage)
+                .build();
+    }
 }

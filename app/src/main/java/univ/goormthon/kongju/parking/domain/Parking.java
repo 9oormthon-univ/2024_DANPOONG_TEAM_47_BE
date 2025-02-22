@@ -2,7 +2,10 @@ package univ.goormthon.kongju.parking.domain;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.web.multipart.MultipartFile;
 import univ.goormthon.kongju.entity.parking.ParkingEntity;
+
+import java.util.List;
 
 @Getter
 public class Parking {
@@ -16,9 +19,10 @@ public class Parking {
     private Integer pmCapacity;
     private String description;
     private Integer rate;
+    private List<MultipartFile> images;
 
     @Builder
-    public Parking(Long id, String name, String address, Double latitude, Double longitude, Integer carCapacity, Integer pmCapacity, String description, Integer rate) {
+    public Parking(Long id, String name, String address, Double latitude, Double longitude, Integer carCapacity, Integer pmCapacity, String description, Integer rate, List<MultipartFile> images) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -28,6 +32,7 @@ public class Parking {
         this.pmCapacity = pmCapacity;
         this.description = description;
         this.rate = rate;
+        this.images = images;
     }
 
     public static Parking of(ParkingEntity parking) {

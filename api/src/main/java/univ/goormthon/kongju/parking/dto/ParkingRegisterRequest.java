@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
+import univ.goormthon.kongju.parking.domain.Parking;
 
 import java.util.List;
 
@@ -29,4 +30,18 @@ public class ParkingRegisterRequest {
 
     @Setter
     private List<MultipartFile> images; // 이미지 필드 추가
+
+    public Parking toDomain() {
+        return Parking.builder()
+                .name(name)
+                .address(address)
+                .images(images)
+                .latitude(latitude)
+                .longitude(longitude)
+                .carCapacity(carCapacity)
+                .pmCapacity(pmCapacity)
+                .description(description)
+                .rate(rate)
+                .build();
+    }
 }
